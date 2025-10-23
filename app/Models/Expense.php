@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\User;
+use App\Models\Category;
+
 
 class Expense extends Model
 {
@@ -90,7 +93,7 @@ class Expense extends Model
         return true;
     }
 
-    public function getNextOccurenceDate(): ?\Carbon\Carbon
+    public function getNextOccurenceDate()
     {
         if(!$this->isRecurring())
         {
@@ -101,14 +104,14 @@ class Expense extends Model
 
         $baseDate = $lastChildExpense ? $lastChildExpense->date : $this->recurring_start_date;
 
-        return match($this->recurring_frequency{
+        return match($this->recurring_frequency){
             'Daily' => $baseDate->copy()->addDay(),
             'Weekly' => $baseDate->copy()->addWeek(),
             'Monthly' => $baseDate->copy()->addMonth(),
             'Yearly' => $baseDate->copy()->addYear(),
             default => null,
 
-        });
+        };
     }
 
 }
