@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\BudgetList;
 use App\Livewire\Categories;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
@@ -20,6 +21,8 @@ Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 
     Route::get('categories', Categories::class)->name('categories.index');
+    Route::get('budgets', BudgetList::class)->name('budgets.index');
+    Route::get('budgets/create', BudgetForm::class)->name('budget.create');
 
     Route::get('settings/profile', Profile::class)->name('profile.edit');
     Route::get('settings/password', Password::class)->name('user-password.edit');

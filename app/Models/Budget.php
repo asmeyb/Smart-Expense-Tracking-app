@@ -44,7 +44,7 @@ class Budget extends Model
         return $this->amount - $this->getSpentAmount();
     }
 
-    public function getPercentUse(): float
+    public function getPercentUsed(): float
     {
         if($this->amount == 0)
         {
