@@ -79,12 +79,18 @@
 
     <!-- Budget List -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 pb-12">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden">
-            <div class="p-5 border-b border-gray-200 dark:border-gray-700">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Category Budgets</h3>
-            </div>
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden">
+        <!-- Header with Create Button -->
+        <div class="p-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Category Budgets</h3>
+            <a href="budgets/create"
+                class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium">
+                + Create Budget
+            </a>
+        </div>
+            
 
-            @if($budgets->count())
+            @if($budgets->count() > 0)
                 <div class="divide-y divide-gray-200 dark:divide-gray-700">
                     @foreach($budgets as $budget)
                         <div class="p-5 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition" wire:key="budget-{{ $budget->id }}">
@@ -105,6 +111,14 @@
                                     <span class="text-sm font-bold @if($budget->is_over) text-red-600 dark:text-red-400 @else text-gray-700 dark:text-gray-300 @endif">
                                         {{ $budget->percentage }}%
                                     </span>
+                                    <a href="/budgets/{{ $budget->id }}/edit"
+                                            class="p-2 text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition"
+                                            title="Edit Budget">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                                                </svg>
+                                    </a>
+
                                     <button wire:click="deleteBudget({{ $budget->id }})"
                                             wire:confirm="Are you sure you want to delete this budget?"
                                             class="p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition">

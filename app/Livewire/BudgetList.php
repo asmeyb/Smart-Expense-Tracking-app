@@ -17,25 +17,24 @@ class BudgetList extends Component
     public function mount()
     {
         $this->selectedMonth = now()->month;
-        $this->selectedYear= now()->year;
+        $this->selectedYear = now()->year;
     }
 
-    #[computed]
+    #[Computed]
     public function budgets()
     {
         return Budget::with('category')
-                ->where('user_id', auth()->user()->id)
-                ->where('month', $this->selectedMonth)
-                ->where('year', $this->selectedYear)
-                ->get()
-                ->map(
-                    function($budget){
-                        $budget->spent = $budget->getSpentAmount();
-                        $budget->remaining = $budget->getRemainingAmount();
-                        $budget->percentage = $budget->getPercentUsed();
-                        $budget->is_over = $budget->isOverBudget();
-                    }
-                );
+            ->where('user_id', auth()->id())
+            ->where('month', $this->selectedMonth)
+            ->where('year', $this->selectedYear)
+            ->get()
+            ->map(function ($budget) {
+                $budget->spent = $budget->getSpentAmount();
+                $budget->remaining = $budget->getRemainingAmount();
+                $budget->percentage = $budget->getPercentUsed();
+                $budget->is_over = $budget->isOverBudget();
+                return $budget;   // <-- add this
+            });
     }
 
     #[Computed]
@@ -58,19 +57,18 @@ class BudgetList extends Component
     #[Computed]
     public function overallPercentage()
     {
-        if($this->totalBudget == 0)
-        {
+        if ($this->totalBudget == 0) {
             return 0;
         }
 
-        return round(($this->totalSpent / $this->totalBudget)*100,1);
+        return round(($this->totalSpent / $this->totalBudget) * 100, 1);
     }
 
     #[Computed]
     public function categories()
     {
         return Category::where('user_id', Auth::user()->id)
-                ->orderBy('name')->get();
+            ->orderBy('name')->get();
     }
 
     public function previousMonth()
@@ -97,8 +95,7 @@ class BudgetList extends Component
     {
         $budget = Budget::findOrFail($id);
 
-        if($budget->user_id !== Auth::user()->id)
-        {
+        if ($budget->user_id !== Auth::user()->id) {
             abort(403);
         }
 
@@ -108,14 +105,16 @@ class BudgetList extends Component
     }
     public function render()
     {
-        return view('livewire.budget-list',
-        [
-            'budgets' => $this->budgets,
-            'totalBudget' => $this->totalBudget,
-            'totalSpent' => $this->totalSpent,
-            'totalRemaining' => $this->totalRemaining,
-            'overallPercentage' => $this->overallPercentage,
-            'categories' => $this->categories,
-        ]);
+        return view(
+            'livewire.budget-list',
+            [
+                'budgets' => $this->budgets,
+                'totalBudget' => $this->totalBudget,
+                'totalSpent' => $this->totalSpent,
+                'totalRemaining' => $this->totalRemaining,
+                'overallPercentage' => $this->overallPercentage,
+                'categories' => $this->categories,
+            ]
+        );
     }
 }
