@@ -3,6 +3,8 @@
 use App\Livewire\BudgetForm;
 use App\Livewire\BudgetList;
 use App\Livewire\Categories;
+use App\Livewire\ExpenseForm;
+use App\Livewire\ExpenseList;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
@@ -24,6 +26,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('categories', Categories::class)->name('categories.index');
     Route::get('budgets', BudgetList::class)->name('budgets.index');
     Route::get('budgets/{budgetId}/edit', BudgetForm::class)->name('budgets.edit');
+
+    Route::get('expenses/{id}/edit', ExpenseForm::class)->name('expenses.edit');
+    Route::get('expenses', ExpenseList::class)->name('expenses.index');
+    Route::get('expenses/create', ExpenseForm::class)->name('expenses.create');
 
     Route::get('budgets/create', BudgetForm::class)->name('budgets.create');
 

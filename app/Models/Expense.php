@@ -23,6 +23,7 @@ class Expense extends Model
     ];
 
     protected $casts = [
+        'date' => 'date', // This tells Laravel to cast the 'date' attribute to a Carbon instance
         'amount' => 'decimal:2',
         'recurring_start_date' => 'date',
         'recurring_end_date' => 'date',
