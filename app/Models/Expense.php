@@ -2,29 +2,34 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\User;
-use App\Models\Category;
-
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Expense extends Model
 {
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'user_id', 'category_id', 'amount', 'title', 'description',
-        'date', 'type', 'recurring_frequency', 'recurring_start_date',
-        'recurring_end_date', 'parent_expense_id', 'is_auto_generated'
+        'user_id',
+        'category_id',
+        'amount',
+        'title',
+        'description',
+        'date',
+        'type',
+        'recurring_frequency',
+        'recurring_start_date',
+        'recurring_end_date',
+        'parent_expense_id',
+        'is_auto_generated',
     ];
 
     protected $casts = [
-        'date' => 'date', // This tells Laravel to cast the 'date' attribute to a Carbon instance
         'amount' => 'decimal:2',
+        'date' => 'date',
         'recurring_start_date' => 'date',
         'recurring_end_date' => 'date',
         'is_auto_generated' => 'boolean',
@@ -42,76 +47,76 @@ class Expense extends Model
 
     public function parentExpense(): BelongsTo
     {
-        return $this->belongsTo(Expense::class);
+        return $this->belongsTo(Expense::class, 'parent_expense_id');
     }
 
     public function childExpenses(): HasMany
     {
-        return $this->hasMany(Expense::class);
+        return $this->hasMany(Expense::class, 'parent_expense_id');
     }
-
-    public function scopeForUser($query, $userId)
+    
+     public function scopeForUser($query, $userId)
     {
-        return $query->where('user_id',$userId);
+        return $query->where('user_id', $userId);
     }
 
     public function scopeRecurring($query)
     {
-        return $query->where('type','recurring');
+        return $query->where('type', 'recurring');
     }
 
     public function scopeOneTime($query)
     {
-        return $query->where('type','one-time');
+        return $query->where('type', 'one-time');
     }
 
     public function scopeInMonth($query, $month, $year)
     {
-        return $query->whereMonth('date', $month)->whereYear('date', $year);
+        return $query->whereMonth('date', $month)
+                     ->whereYear('date', $year);
     }
 
-    public function scopeInDateRange($query,$startDate, $endDate)
+    public function scopeInDateRange($query, $startDate, $endDate)
     {
-        return $query->whereBetween('date',[$startDate, $endDate]);   
+        return $query->whereBetween('date', [$startDate, $endDate]);
     }
 
     public function isRecurring(): bool
     {
-        return $this->type == 'recurring';
+        return $this->type === 'recurring';
     }
 
-    public function shouldGenerateNextOccurence(): bool
+    public function shouldGenerateNextOccurrence(): bool
     {
-        if(!$this->isRecurring()){
+        if (!$this->isRecurring()) {
             return false;
         }
 
-        if($this->recurring_end_date && now()->isAfter($this->recurring_end_date))
-        {
+        if ($this->recurring_end_date && now()->isAfter($this->recurring_end_date)) {
             return false;
         }
 
         return true;
     }
 
-    public function getNextOccurenceDate()
+     public function getNextOccurrenceDate(): ?\Carbon\Carbon
     {
-        if(!$this->isRecurring())
-        {
+        if (!$this->isRecurring()) {
             return null;
         }
 
-        $lastChildExpense = $this->childExpenses()->orderBy('date','DESC')->first();
+        $lastChildExpense = $this->childExpenses()
+            ->orderBy('date', 'desc')
+            ->first();
 
         $baseDate = $lastChildExpense ? $lastChildExpense->date : $this->recurring_start_date;
 
-        return match($this->recurring_frequency){
-            'Daily' => $baseDate->copy()->addDay(),
-            'Weekly' => $baseDate->copy()->addWeek(),
-            'Monthly' => $baseDate->copy()->addMonth(),
-            'Yearly' => $baseDate->copy()->addYear(),
+        return match($this->recurring_frequency) {
+            'daily' => $baseDate->copy()->addDay(),
+            'weekly' => $baseDate->copy()->addWeek(),
+            'monthly' => $baseDate->copy()->addMonth(),
+            'yearly' => $baseDate->copy()->addYear(),
             default => null,
-
         };
     }
 

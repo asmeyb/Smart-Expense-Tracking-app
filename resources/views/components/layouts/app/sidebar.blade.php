@@ -27,6 +27,8 @@
                 
                 
                     <flux:navlist.item icon="banknotes" :href="route('expenses.index')" :current="request()->routeIs('expenses.index')" wire:navigate>{{ __('Expenses') }}</flux:navlist.item>
+
+                    <flux:navlist.item icon="arrow-path" :href="route('expenses.recurring')" :current="request()->routeIs('expenses.recurring')" wire:navigate>{{ __('Recurring Expenses') }}</flux:navlist.item>
                 
             </flux:navlist>
 
